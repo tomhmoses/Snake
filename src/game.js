@@ -5,8 +5,8 @@ export function Game(props) {
     const [history, setHistory] = useState([[['','',''],['','',''],['','','']]])
     var turn = players[history.length % players.length]
     return (
-        <div>
-            <div>Noughts and Crosses</div>
+        <div className='bg-black min-h-screen font-semibold text-indigo-400 p-10'>
+            <h1 className="text-3xl font-bold underline pb-2">Noughts and Crosses</h1>
             <div>{turn}'s Turn</div>
             <Board board={history.at(-1)}/>
         </div>
@@ -15,7 +15,7 @@ export function Game(props) {
 
 function Board(props) {
     return (
-        <div>
+        <div className='flex border-2 w-min border-indigo-400'>
             {props.board.map((row, y) => (
                 <Row row={row} y={y}/>
             ))}
@@ -37,7 +37,7 @@ function Cell(props) {
     // passed current board state
     // passed an x and y
     return (
-        <div>
+        <div className='border-indigo-100 border-2 h-10 w-10 text-center'>
             {props.element}
         </div>
     )
