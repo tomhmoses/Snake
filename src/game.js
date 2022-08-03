@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 
 export function Game(props) {
-    const players = ['X','O']
-    const [history, setHistory] = useState([[['','',''],['','',''],['','','']]])
+    const players = ['X', 'O']
+    const [history, setHistory] = useState([[['', '', ''], ['', '', ''], ['', '', '']]])
     const [winner, setWinner] = useState('')
-    console.log(history)
-    var board=history.at(-1)
+    // console.log(history)
+    var lastboard = history.at(-1)
+    var board = lastboard.map(function (arr) {
+        return arr.slice();
+    });
     var turn = players[history.length % players.length]
 
     function pushToHistory(board) {
-        setHistory([...history, board ])
+        setHistory([...history, [...board]])
     }
 
     function clickCell(x, y) {
@@ -25,19 +28,26 @@ export function Game(props) {
     }
 
     return (
-        <div className='bg-black min-h-screen font-semibold text-indigo-400 p-10'>
-            <h1 className="text-3xl font-bold underline pb-2">Noughts and Crosses</h1>
-            {!winner && <div>{turn}'s Turn</div>}
-            {winner && <div>{winner} Wins!</div>}
-            <Board board={board} clickCell={clickCell}/>
-            <Reset setHistory={setHistory} setWinner={setWinner}/>
+        <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
+            <div className='bg-green-100 h-full flex flex-col flex-grow'>
+                <div className='flex-none'>
+                    <h1 className="text-3xl font-bold underline pb-2">Noughts and Crosses</h1>
+                    {!winner && <div>{turn}'s Turn</div>}
+                    {winner && <div>{winner} Wins!</div>}
+                </div>
+                <Board board={board} clickCell={clickCell} />
+                <div className='flex justify-around'>
+                    <Reset setHistory={setHistory} setWinner={setWinner} />
+                    <Undo history={history} setHistory={setHistory} />
+                </div>
+            </div>
         </div>
     )
 }
 
 function Reset(props) {
     var reset = () => {
-        props.setHistory([[['','',''],['','',''],['','','']]])
+        props.setHistory([[['', '', ''], ['', '', ''], ['', '', '']]])
         props.setWinner('')
     }
     return (
@@ -45,46 +55,61 @@ function Reset(props) {
     )
 }
 
+function Undo(props) {
+    var undo = () => {
+        if (props.history.length > 1) {
+            console.log(props.history)
+            var historyCopy = [...props.history]
+            console.log(historyCopy)
+            historyCopy.pop()
+            console.log(historyCopy)
+            props.setHistory(historyCopy)
+        }
+    }
+    return (
+        <div onClick={undo}>Undo</div>
+    )
+}
+
 function Board(props) {
     return (
-        <div className='flex border-2 w-min border-indigo-400'>
-            {props.board.map((row, y) => (
-                <Row row={row} y={y} clickCell={props.clickCell}/>
-            ))}
+        <div className='flex-grow border-2 border-indigo-400'>
+            <div className='flex border-2 border-indigo-800'>
+                <div className='flex flex-grow flex-col max-h-96 max-w-[24rem] max-w m-auto aspect-square border-2 border-green-600'>
+                    {props.board.map((row, y) => (
+                        <Row row={row} y={y} key={y} clickCell={props.clickCell} />
+                    ))}
+                </div>
+
+            </div>
         </div>
     )
 }
 
 function Row(props) {
     return (
-        <div>
+        <div className='flex h-10 flex-grow'>
             {props.row.map((element, x) => (
-                <Cell element={element} x={x} y={props.y} clickCell={props.clickCell}/>
+                <Cell element={element} x={x} key={x} y={props.y} clickCell={props.clickCell} />
             ))}
         </div>
     )
 }
 
 
-
 function Cell(props) {
-    if (props.element) {
-        return (
-            <div className='border-indigo-100 border-2 h-10 w-10 text-center'>
-                {props.element}
-            </div>
-        )
-    } else {
-        var clickThisCell = () => {
-            props.clickCell(props.x,props.y)
+    var clickThisCell = () => {
+        if (!props.element) {
+            props.clickCell(props.x, props.y)
         }
-        return (
-            <div className='border-indigo-100 border-2 h-10 w-10 text-center cursor-pointer' onClick={clickThisCell}>
-                {props.element}
-            </div>
-        )
     }
-    
+    return (
+        <div className={classNames(!props.element ? 'text-center cursor-pointer' : '', 'border-indigo-100 border-2 flex-grow w-10')} onClick={clickThisCell}>
+            {props.element}
+        </div>
+    )
+
+
 }
 
 function checkForWinner(board, setWinner) {
@@ -100,9 +125,9 @@ function checkForWinner(board, setWinner) {
             if (board[y][x] !== '' && board[y][x] === currentPlayer) {
                 currentRun++
                 if (currentRun === winAmount) {
-                    console.log('winner:')
-                    console.log(currentRun)
-                    console.log(currentPlayer)
+                    // console.log('winner:')
+                    // console.log(currentRun)
+                    // console.log(currentPlayer)
                     setWinner(currentPlayer)
                 }
             } else {//switch to new player
@@ -129,4 +154,8 @@ function checkForWinner(board, setWinner) {
         }
     }
     // check diagonal
+}
+
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
 }
