@@ -153,7 +153,27 @@ function checkForWinner(board, setWinner) {
             }
         }
     }
-    // check diagonal
+    // check diagonal down right
+    // start bottom left... start only when length possible
+    // move to top right... stop when length impossible
+    var myCalc = (i) => {
+        if (i <= board.length) {
+            return i
+        } else {
+            return board.length * 2 - 2 - i
+        }
+    } 
+    for (var i = winAmount - 1; i < (board.length * 2 - 1 - (winAmount - 1)); y++) { //each diagonal is numbered (starting with 0), heres where to start and end.
+        currentPlayer = ''
+        currentRun = 0
+        for (var n = 0; n < (myCalc(i)); n++) {
+
+        }
+    }
+    // check diagonal up right
+    // start top left... 
+    // end top right...
+
 }
 
 function classNames(...classes) {
