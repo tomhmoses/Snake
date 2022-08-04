@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 export function Game(props) {
     const players = ['X', 'O']
     const [history, setHistory] = useState([[['', '', ''], ['', '', ''], ['', '', '']]])
-    const [winner, setWinner] = useState('')
+    
     // console.log(history)
     var lastboard = history.at(-1)
     var board = lastboard.map(function (arr) {
         return arr.slice();
     });
+    var winner = checkForWinner(board)
     var turn = players[history.length % players.length]
 
     function pushToHistory(board) {
@@ -23,10 +24,6 @@ export function Game(props) {
         }
     }
 
-    if (!winner) {
-        checkForWinner(board, setWinner)
-    }
-
     return (
         <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
             <div className='bg-green-100 h-full flex flex-col flex-grow'>
@@ -37,7 +34,7 @@ export function Game(props) {
                 </div>
                 <Board board={board} clickCell={clickCell} />
                 <div className='flex justify-around'>
-                    <Reset setHistory={setHistory} setWinner={setWinner} />
+                    <Reset setHistory={setHistory} />
                     <Undo history={history} setHistory={setHistory} />
                 </div>
             </div>
@@ -48,7 +45,6 @@ export function Game(props) {
 function Reset(props) {
     var reset = () => {
         props.setHistory([[['', '', ''], ['', '', ''], ['', '', '']]])
-        props.setWinner('')
     }
     return (
         <div onClick={reset}>Reset</div>
@@ -112,7 +108,7 @@ function Cell(props) {
 
 }
 
-function checkForWinner(board, setWinner) {
+function checkForWinner(board) {
     // check horizontal
     const winAmount = 3;
     var currentPlayer = ''
@@ -128,7 +124,7 @@ function checkForWinner(board, setWinner) {
                     // console.log('winner:')
                     // console.log(currentRun)
                     // console.log(currentPlayer)
-                    setWinner(currentPlayer)
+                    return currentPlayer
                 }
             } else {//switch to new player
                 currentPlayer = board[y][x]
@@ -145,7 +141,7 @@ function checkForWinner(board, setWinner) {
             if (board[y][x] !== '' && board[y][x] === currentPlayer) {
                 currentRun++
                 if (currentRun === winAmount) {
-                    setWinner(currentPlayer)
+                    return currentPlayer
                 }
             } else {//switch to new player
                 currentPlayer = board[y][x]
@@ -156,20 +152,21 @@ function checkForWinner(board, setWinner) {
     // check diagonal down right
     // start bottom left... start only when length possible
     // move to top right... stop when length impossible
-    var myCalc = (i) => {
-        if (i <= board.length) {
-            return i
-        } else {
-            return board.length * 2 - 2 - i
-        }
-    } 
-    for (var i = winAmount - 1; i < (board.length * 2 - 1 - (winAmount - 1)); y++) { //each diagonal is numbered (starting with 0), heres where to start and end.
-        currentPlayer = ''
-        currentRun = 0
-        for (var n = 0; n < (myCalc(i)); n++) {
-
-        }
-    }
+    // var myCalc = (i) => {
+    //     if (i <= board.length) {
+    //         return i
+    //     } else {
+    //         return board.length * 2 - 2 - i
+    //     }
+    // } 
+    // for (var i = winAmount - 1; i < (board.length * 2 - 1 - (winAmount - 1)); y++) { //each diagonal is numbered (starting with 0), heres where to start and end.
+    //     currentPlayer = ''
+    //     currentRun = 0
+    //     for (var n = 0; n < (myCalc(i)); n++) {
+    //         console.log(i)
+    //         console.log(n)
+    //     }
+    // }
     // check diagonal up right
     // start top left... 
     // end top right...
