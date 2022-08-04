@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 
 export function Game(props) {
     const players = ['X', 'O']
-    const [history, setHistory] = useState([[['', '', ''], ['', '', ''], ['', '', '']]])
+    const boardLength = 5
+    const [history, setHistory] = useState([createBoard(boardLength)])
+    console.log(history)
 
     // console.log(history)
     var lastboard = history.at(-1)
@@ -26,15 +28,17 @@ export function Game(props) {
 
     return (
         <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
-            <div className='bg-green-100 h-full flex flex-col flex-grow'>
+            <div className='h-full flex flex-col flex-grow'>
                 <div className='flex-none'>
-                    <h1 className="text-3xl font-bold underline pb-2">Noughts and Crosses</h1>
-                    {!winner && <div>{turn}'s Turn</div>}
-                    {winner && <div>{winner} Wins!</div>}
+                    <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">Noughts and Crosses</h1>
+                    <div className='text-center'>
+                        {!winner && <div>{turn}'s Turn</div>}
+                        {winner && <div>{winner} Wins!</div>}
+                    </div>
                 </div>
                 <Board board={board} clickCell={clickCell} />
                 <div className='flex justify-around'>
-                    <Reset setHistory={setHistory} />
+                    <Reset setHistory={setHistory} boardLength={boardLength} />
                     <Undo history={history} setHistory={setHistory} />
                 </div>
             </div>
@@ -44,7 +48,8 @@ export function Game(props) {
 
 function Reset(props) {
     var reset = () => {
-        props.setHistory([[['', '', ''], ['', '', ''], ['', '', '']]])
+        var boardLength = props.boardLength
+        props.setHistory([createBoard(boardLength)])
     }
     return (
         <div onClick={reset}>Reset</div>
@@ -69,14 +74,15 @@ function Undo(props) {
 
 function Board(props) {
     return (
-        <div className='flex-grow border-2 border-indigo-400'>
-            <div className='flex border-2 border-indigo-800'>
-                <div className='flex flex-grow flex-col max-h-96 max-w-[24rem] max-w m-auto aspect-square border-2 border-green-600'>
+        <div className='flex-grow'>
+            <div className='flex  h-full'>
+                <div className='flex flex-grow'></div>
+                <div className='flex flex-grow flex-col max-h-96 max-w-[24rem] max-w m-auto aspect-square border-8 rounded-lg border-indigo-600'>
                     {props.board.map((row, y) => (
                         <Row row={row} y={y} key={y} clickCell={props.clickCell} />
                     ))}
                 </div>
-
+                <div className='flex flex-grow'></div>
             </div>
         </div>
     )
@@ -100,8 +106,10 @@ function Cell(props) {
         }
     }
     return (
-        <div className={classNames(!props.element ? 'text-center cursor-pointer' : '', 'border-indigo-100 border-2 flex-grow w-10')} onClick={clickThisCell}>
-            {props.element}
+        <div className={classNames(!props.element ? 'text-center cursor-pointer' : '', 'border-indigo-100 border-2 flex flex-grow w-10 text-2xl text-center content-center flex-col')} onClick={clickThisCell}>
+            <div className='flex flex-grow'></div>
+            <div className=''>{props.element}</div>
+            <div className='flex flex-grow'></div>
         </div>
     )
 
@@ -233,4 +241,8 @@ function checkForWinner(board) {
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
+}
+
+function createBoard(length) {
+    return [...Array(length)].map(() => Array(length).fill(''))
 }
