@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 export function Game(props) {
-    const players = ['X', 'O']
-    const boardLength = 5
+    const players = ['A', 'W', 'L', 'T']
+    const boardLength = 10
     const [history, setHistory] = useState([createBoard(boardLength)])
     console.log(history)
 
