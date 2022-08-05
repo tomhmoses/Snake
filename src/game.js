@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { getAnalytics, logEvent } from "firebase/analytics";
-
-const analytics = getAnalytics();
 
 
 export function Game(props) {
@@ -52,7 +49,6 @@ export function Game(props) {
 
 function Reset(props) {
     var reset = () => {
-        logEvent(analytics, 'reset');
         var boardLength = props.boardLength
         props.setHistory([createBoard(boardLength)])
     }
@@ -64,7 +60,6 @@ function Reset(props) {
 function Undo(props) {
     var undo = () => {
         if (props.history.length > 1) {
-            logEvent(analytics, 'undo');
             console.log(props.history)
             var historyCopy = [...props.history]
             console.log(historyCopy)
