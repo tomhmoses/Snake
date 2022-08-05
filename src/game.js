@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 
 export function Game(props) {
+    useEffect(() => {
+        document.title = 'x';
+      });
+
     const players = ['A', 'W', 'L', 'T']
     const boardLength = 10
     const [history, setHistory] = useState([createBoard(boardLength)])
@@ -31,7 +35,7 @@ export function Game(props) {
         <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
             <div className='h-full flex flex-col flex-grow'>
                 <div className='flex-none'>
-                    <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">Noughts and Crosses</h1>
+                    <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">x.tmos.es</h1>
                     <div className='text-center'>
                         {!winner && <div>{turn}'s Turn</div>}
                         {winner && <div>{winner} Wins!</div>}
