@@ -6,8 +6,8 @@ export function Game(props) {
         document.title = 'x';
       });
 
-    const players = ['A', 'W', 'L', 'T']
-    const boardLength = 10
+    const players = ['X', 'O', 'Y']
+    const boardLength = 5
     const [history, setHistory] = useState([createBoard(boardLength)])
     console.log(history)
 
