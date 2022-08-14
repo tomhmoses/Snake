@@ -29,15 +29,13 @@ export function New(props) { //new online? game
 
     return ( // base style from: https://tailwindui.com/components/application-ui/overlays/modals
         <div>
-            <div className="text-center mt-5 p-2">
                 <button
                     type="button"
                     onClick={toggleExpand}
-                    className="inline-flex justify-center rounded-md border border-transparent w-full max-w-xs py-1 mb-4 bg-sky-500 font-medium text-white hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 text-sm"
+                    className=""
                 >
-                    Create new team
+                    New
                 </button>
-            </div>
             <Transition.Root show={expanded} as={Fragment}>
                 <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={boardSizeInput} onClose={toggleExpand}>
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">

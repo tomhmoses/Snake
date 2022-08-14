@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { New } from './New';
 
 
 export function Game(props) {
@@ -43,6 +44,7 @@ export function Game(props) {
                 </div>
                 <Board board={board} clickCell={clickCell} />
                 <div className='flex justify-around'>
+                    <New />
                     <Reset setHistory={setHistory} boardLength={boardLength} />
                     <Undo history={history} setHistory={setHistory} />
                 </div>
