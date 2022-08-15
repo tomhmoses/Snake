@@ -38,6 +38,7 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
     res.json({result: `Game with ID: ${writeResult.id} created.`, gameId: writeResult.id});
 });
 
+// Join a game
 exports.joinGame = functions.https.onRequest(async (req, res) => {
     // get the game ID from the request
     const gameId = req.query.gameId;
