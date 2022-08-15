@@ -12,6 +12,18 @@
     ],
     "rewrites": [
       {
+        "source": "/api/createGame",
+        "function": "createGame"
+      },
+      {
+        "source": "/api/joinGame",
+        "function": "joinGame"
+      },
+      {
+        "source": "/api/playTurn",
+        "function": "playTurn"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
