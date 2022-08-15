@@ -33,7 +33,7 @@ export function Game(props) {
         function clickCell(x, y) {
             if (myTurn) {
                 var url = new URL("https://x.tmos.es/api/playTurn"),
-                    params = { idToken: props.user.accessToken, gameId: props.gameId }
+                    params = { idToken: props.user.accessToken, gameId: props.gameId, x: x, y: y }
                 Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
                 fetch(url)
                     .then(response => response.json())
