@@ -26,12 +26,24 @@ export function Game(props) {
         var turn = gameData.turn
         var players = gameData.players
         let myTurn = false;
-        if (started && !winner && turn % players.length === props.playerNum) {
+        if (started && !winner && turn % players.length === players[props.user.uid].playerNum) {
             myTurn = true;
         }
 
+        const increaseTurn = () => {
+            turn = turn + 1;
+        }
+        const tempSetBoardLocation = (x, y, element) => {
+            board[y][x] = element;
+        }
+
         function clickCell(x, y) {
+            console.log('myTurn', myTurn)
             if (myTurn) {
+
+                increaseTurn();
+                tempSetBoardLocation(x, y, props.playerSymbol);
+                console.log('temparily changed local board')
                 var url = new URL("https://x.tmos.es/api/playTurn"),
                     params = { idToken: props.user.accessToken, gameId: props.gameId, x: x, y: y }
                 Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
