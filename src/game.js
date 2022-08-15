@@ -88,13 +88,13 @@ function Board(props) {
     return (
         <div className='flex-grow'>
             <div className='flex  h-full'>
-                <div className='flex flex-grow'></div>
+                <div className='hidden sm:flex flex-grow '></div>
                 <div className='flex flex-grow flex-col max-h-96 max-w-[24rem] max-w m-auto aspect-square border-8 rounded-lg border-indigo-600'>
                     {props.board.map((row, y) => (
                         <Row row={row} y={y} key={y} clickCell={props.clickCell} />
                     ))}
                 </div>
-                <div className='flex flex-grow'></div>
+                <div className='hidden sm:flex flex-grow'></div>
             </div>
         </div>
     )
