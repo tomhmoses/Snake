@@ -16,6 +16,7 @@ export function Players(props) {
         return first.playerNum - second.playerNum;
     });
     var turn = props.turn % players.length;
+    var currentPlayer = players[turn];
     
     return (
         <div className='flex-col justify-center p-4'>
@@ -29,7 +30,9 @@ export function Players(props) {
             </div>
             <div className='flex justify-center p-1'>You are: {props.players[props.user.uid].symbol}</div>
             {props.myTurn && <div className='flex justify-center p-1'>Your turn</div>}
-            {!props.gameStarted && <div className='flex justify-center p-1'>Wait for the other players to join, then click Start to begin the game.</div>}
+            {props.started && !props.winner && !props.myTurn && <div className='flex justify-center p-1'>{currentPlayer.symbol}'s turn</div>}
+            {props.winner && <div className='flex justify-center p-1'>🎉 {props.winner} wins! 🎉</div>}
+            {!props.started && <div className='flex justify-center p-1'>Wait for the other players to join, then click Start to begin the game.</div>}
         </div>
     )
 }

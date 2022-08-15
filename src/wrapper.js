@@ -20,7 +20,6 @@ export function Wrapper(props) {
                 <div className='h-full flex flex-col flex-grow'>
                     <div className='flex-none'>
                         <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">x.tmos.es</h1>
-                        <br/>
                     </div>
                     {!gameId && <New user={props.user} setGameId={setGameId}/>}
                     {!gameId && <Join user={props.user} setGameId={setGameId}/>}
