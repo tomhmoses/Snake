@@ -42,6 +42,7 @@ exports.createGame = functions
         turn: 0,
         winner: null,
         started: false,
+        expireAt: newTTL(),
       };
       game["players"] = {};
       game["players"][uid] = {symbol: "X", color: "indigo", playerNum: 0};
