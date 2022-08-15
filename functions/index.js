@@ -52,18 +52,21 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
     const gameData = await gameRef.get();
     if (!gameData.exists) {
         res.status(404).send('Game not found.');
+        return;
     }
     // check if the player is already in the game
     const players = gameData.data().players;
     console.log('players', players);
     if (players[uid]) {
         res.status(400).send('Player already in game.');
+        return;
     }
     // check if symbol is already in use
-    // const symbols = Object.values(players).map(player => player.symbol);
-    // if (symbols.includes(symbol)) {
-    //     res.status(400).send('Symbol already in use.');
-    // }
+    const symbols = Object.values(players).map(player => player.symbol);
+    if (symbols.includes(symbol)) {
+        res.status(400).send('Symbol already in use.');
+        return;
+    }
     // add the player to the game
     players[uid] = {symbol: symbol, color: color};
     await gameRef.update({players: players});
