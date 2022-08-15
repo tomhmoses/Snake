@@ -9,7 +9,8 @@ function classNames(...classes) {
 
 export function Join(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
-    const [gameID, setGameID] = useState(3);
+    const [gameID, setGameID] = useState('');
+    const [symbol, setSymbol] = useState('Y');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -17,11 +18,27 @@ export function Join(props) { //new online? game
         setGameID(target.value);
     }
 
+    const handleSymbolChange = ({ target }) => {
+        // check target length is 0 or 1
+        if (target.value.length >=0 && target.value.length <= 1) {
+            setSymbol(target.value.toUpperCase());
+        }
+        // if length is 2, set to the new char
+        if (target.value.length === 2) {
+            let first = target.value.charAt(0).toUpperCase();
+            if (first === symbol) {
+                setSymbol(target.value.charAt(1).toUpperCase());
+            } else {
+                setSymbol(first);
+            }
+        }
+    }
+
     const handleJoin = () => {
         if (!loading) {
             setLoading(true);
             var url = new URL("https://x.tmos.es/api/joinGame"),
-              params = { idToken: props.user.accessToken, gameID: gameID }
+              params = { idToken: props.user.accessToken, gameID: gameID, symbol: symbol }
             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
             fetch(url)
               .then(response => response.text())
@@ -106,7 +123,21 @@ export function Join(props) { //new online? game
                                                     onChange={handleChange}
                                                     type="text"
                                                     spellcheck="false"
-                                                    className="p-2 w-full rounded-lg border invalid:border-red-500"
+                                                    className="p-2 w-full rounded-lg border"
+                                                />
+                                            </div>
+                                            <div className="mt-2">
+                                                <div className='flex justify-between'>
+                                                    <p className="text-sm text-gray-500">
+                                                        Player symbol:
+                                                    </p>
+                                                </div>
+                                                <input
+                                                    value={symbol}
+                                                    onChange={handleSymbolChange}
+                                                    type="text"
+                                                    spellcheck="false"
+                                                    className="p-2 w-full rounded-lg border"
                                                 />
                                             </div>
                                         </div>
