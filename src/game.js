@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import React from 'react';
+import { doc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firehooks/firestore';
 
 export function Game(props) {
-
-    useEffect(() => {
-        document.title = 'x: ' + props.gameId;
-    });
-
-
     const gameRef = doc(props.firestore, "games", props.gameId);
     const [gameData, loading, error] = useDocumentData(gameRef);
 
+    console.log(gameData)
+
     if (gameData) {
-        const players = gameData.players
-        const boardLength = gameData.size
-        var board = createBoard(boardLength)
-        setDoc(props.gameRef, { board: board }, { merge: true });
-        //var board = gameData.board
+        // const players = gameData.players
+        // const boardLength = gameData.size
+        var board = []
+        for (let i = 0; i < gameData.size; i++) {
+            board.push(gameData.board[i].split("").map(
+                (element) => {
+                    return element === "_" ? "" : element
+                }
+            ));
+        }
         var winner = gameData.winner
         var turn = gameData.turn
 
@@ -28,18 +29,10 @@ export function Game(props) {
         }
 
         return (
-            <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
-                <div className='h-full flex flex-col flex-grow'>
-                    <div className='flex-none'>
-                        <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">x.tmos.es</h1>
-                        <div className='text-center'>
-                            {!winner && <div>{turn}'s Turn</div>}
-                            {winner && <div>{winner} Wins!</div>}
-                        </div>
-                    </div>
-                    <Board board={board} clickCell={clickCell} />
-                    <Reset gameRef={gameRef} boardLength={boardLength} />
-                </div>
+            <div>
+                {!winner && <div>{turn}'s Turn</div>}
+                {winner && <div>{winner} Wins!</div>}
+                <Board board={board} clickCell={clickCell} />
             </div>
         )
     } else if (loading) {
@@ -97,19 +90,4 @@ function Cell(props) {
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
-}
-
-function createBoard(length) {
-    return [...Array(length)].map(() => Array(length).fill(''))
-}
-
-function Reset(props) {
-    var reset = () => {
-        var boardLength = props.boardLength
-        var board = createBoard(boardLength)
-        setDoc(props.gameRef, { board: board }, { merge: true });
-    }
-    return (
-        <div onClick={reset}>Reset</div>
-    )
 }

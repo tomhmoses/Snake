@@ -7,25 +7,20 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export function New(props) { //new online? game
+export function Join(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
-    const [boardSize, setBoardSize] = useState(3);
-    const [winSize, setWinSize] = useState(3);
+    const [gameID, setGameID] = useState(3);
     const [loading, setLoading] = useState(false);
 
-    const handleSizeChange = ({ target }) => {
-        setBoardSize(target.value);
+    const handleChange = ({ target }) => {
+        setGameID(target.value);
     }
 
-    const handleWinSizeChange = ({ target }) => {
-        setWinSize(target.value);
-    }
-
-    const handleCreate = () => {
+    const handleJoin = () => {
         if (!loading) {
             setLoading(true);
-            var url = new URL("https://x.tmos.es/api/createGame"),
-              params = { idToken: props.user.accessToken, size: boardSize, winSize: winSize }
+            var url = new URL("https://x.tmos.es/api/joinGame"),
+              params = { idToken: props.user.accessToken, gameID: gameID }
             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
             fetch(url)
               .then(response => response.text())
@@ -33,8 +28,8 @@ export function New(props) { //new online? game
                 console.log('response:');
                 console.log(response);
                 setLoading(false);
-                if (response.includes('created')) {
-                    props.setGameID(response.gameId);
+                if (response.includes('Cool!')) {
+                    props.setGameID(gameID);
                 }
               })
               .catch(err => console.log(err))
@@ -45,7 +40,7 @@ export function New(props) { //new online? game
         setExpanded(!expanded);
     };
 
-    const boardSizeInput = useRef(null)
+    const gameIDInput = useRef(null)
 
 
     return ( // base style from: https://tailwindui.com/components/application-ui/overlays/modals
@@ -55,10 +50,10 @@ export function New(props) { //new online? game
                     onClick={toggleExpand}
                     className=""
                 >
-                    New
+                    Join
                 </button>
             <Transition.Root show={expanded} as={Fragment}>
-                <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={boardSizeInput} onClose={toggleExpand}>
+                <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={gameIDInput} onClose={toggleExpand}>
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <Transition.Child
                             as={Fragment}
@@ -93,34 +88,20 @@ export function New(props) { //new online? game
                                         </div>
                                         <div className="flex-grow mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                             <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                                Create a new game
+                                                Join a game
                                             </Dialog.Title>
                                             <div className="mt-2">
                                                 <div className='flex justify-between'>
                                                     <p className="text-sm text-gray-500">
-                                                        Board Size:
+                                                        Game ID:
                                                     </p>
                                                 </div>
                                                 <input
-                                                    ref={boardSizeInput}
-                                                    value={boardSize}
-                                                    onChange={handleSizeChange}
+                                                    ref={gameIDInput}
+                                                    value={gameID}
+                                                    onChange={handleChange}
                                                     type="number"
                                                     min="1"
-                                                    className="p-2 w-full rounded-lg border invalid:border-red-500"
-                                                />
-                                            </div>
-                                            <div className="mt-2">
-                                                <div className='flex justify-between'>
-                                                    <p className="text-sm text-gray-500">
-                                                        Win Size:
-                                                    </p>
-                                                </div>
-                                                <input
-                                                    value={winSize}
-                                                    onChange={handleWinSizeChange}
-                                                    type="number"
-                                                    min="2"
                                                     className="p-2 w-full rounded-lg border invalid:border-red-500"
                                                 />
                                             </div>
@@ -131,10 +112,9 @@ export function New(props) { //new online? game
                                     <button
                                         type="button"
                                         className={classNames(loading ? 'animate-pulse' : '', "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50")}
-                                        onClick={handleCreate}
-                                        disabled={!(boardSize > 0)} //TODO: check this is an integer
+                                        onClick={handleJoin}
                                     >
-                                        Create
+                                        Join
                                     </button>
                                     <button
                                         type="button"
