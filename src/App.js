@@ -2,7 +2,8 @@ import { Game } from './game';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics } from "firebase/analytics"
+import { getFirestore } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -23,12 +24,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // eslint-disable-next-line no-unused-vars
 const analytics = getAnalytics(app);
+const firestore = getFirestore(app);
 
 
 function App() {
 
   return (
-    <Game />
+    <Game firestore={firestore} gameId={'sample'} />
   );
 }
 
