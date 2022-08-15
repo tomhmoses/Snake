@@ -104,8 +104,8 @@ export function Join(props) { //new online? game
                                                     ref={gameIDInput}
                                                     value={gameID}
                                                     onChange={handleChange}
-                                                    type="number"
-                                                    min="1"
+                                                    type="text"
+                                                    spellcheck="false"
                                                     className="p-2 w-full rounded-lg border invalid:border-red-500"
                                                 />
                                             </div>
