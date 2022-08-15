@@ -27,11 +27,23 @@ exports.addMessage = functions.https.onRequest(async (req, res) => {
 exports.createGame = functions.https.onRequest(async (req, res) => {
     // get the game size from the request
     const size = parseInt(req.query.size);
+    // get the win size from the request
+    const winSize = parseInt(req.query.winSize);
+    // check valid size
+    if (size < 1) {
+        res.status(400).send('Invalid size');
+        return;
+    }
+    // check for valid win size
+    if (winSize > size) {
+        res.status(400).send('winSize must be less than or equal to size');
+        return;
+    }
     // create the board
     const board = createBoard(size);
     console.log('board', board);
     // create a new game in Firestore using the Firebase Admin SDK
-    var game = {board: board, size: size, turn: 0, winner: null, started: false};
+    var game = {board: board, size: size, winSize: winSize, turn: 0, winner: null, started: false};
     game['players'] = {};
     game['players'][req.query.uid] = {symbol: 'X', color: 'indigo', playerNum: 0};
     const writeResult = await admin.firestore().collection('games').add(game);
@@ -113,8 +125,8 @@ exports.playTurn = functions.https.onRequest(async (req, res) => {
     // get the player's UID from the request
     const uid = req.query.uid;
     // get the player's turn from the request
-    const row = parseInt(req.query.row);
-    const col = parseInt(req.query.col);
+    const x = parseInt(req.query.x);
+    const y = parseInt(req.query.y);
     // check if the game exists
     const gameRef = admin.firestore().collection('games').doc(gameId);
     const gameData = await gameRef.get();
@@ -147,23 +159,23 @@ exports.playTurn = functions.https.onRequest(async (req, res) => {
         res.status(400).send('Wrong turn.');
         return;
     }
-    // check if the row and column are valid
-    if (row < 0 || row >= gameData.data().size || col < 0 || col >= gameData.data().size) {
-        res.status(400).send('Invalid row or column.');
+    // check if the x and y are valid
+    if (x < 0 || x >= gameData.data().size || y < 0 || y >= gameData.data().size) {
+        res.status(400).send('Invalid x or y.');
         return;
     }
-    // check if the row and column are empty
+    // check if the x and y are empty
     const board = gameData.data().board;
     console.log('board', board);
-    console.log('row', row);
-    console.log('col', col);
-    console.log('whats there', board[row][col])
-    if (board[row][col] != '_') {
+    console.log('x', x);
+    console.log('y', y);
+    console.log('whats there', board[y][x])
+    if (board[y][x] != '_') {
         res.status(400).send('Space already taken.');
         return;
     }
     // play the turn
-    board[col] = setCharAt(board[col], row, players[uid].symbol);
+    board[y] = setCharAt(board[y], x, players[uid].symbol);
     await gameRef.update({board: board, turn: gameData.data().turn + 1});
     res.json({result: `Turn played.`});
 });
@@ -178,9 +190,144 @@ exports.checkWinner = functions.firestore.document('/games/{gameId}')
 .onUpdate((snap, context) => { 
     // get the game data
     const gameData = snap.after.data();
-    console.log('TODO: check for winner');
+    // convert board to 2D array
+    var betterBoard = [];
+    for (var i = 0; i < gameData.size; i++) {
+        betterBoard.push(gameData.board[i].split(''));
+    }
+    console.log('betterBoard', betterBoard);
+    console.log('winSize', gameData.winSize);
+    // check if there is a winner
+    var winner = checkForWinner(betterBoard, gameData.winSize);
+    console.log('winner', winner);
+    if (winner) {
+        // update the game
+        return snap.after.ref.update({winner: winner});
+    }
+    console.log('no winner');
 });
 
+function checkForWinner(board, winSize = 3) {
+  // check horizontal
+  var currentPlayer = ''
+  var currentRun = 0
+  var x
+  var y
+  for (x = 0; x < board.length; x++) {
+      currentPlayer = ''
+      currentRun = 0
+      for (y = 0; y < board.length; y++) {
+          //check for continuation
+          if (board[y][x] !== '' && board[y][x] === currentPlayer) {
+              currentRun++
+              if (currentRun === winSize) {
+                  // console.log('winner:')
+                  // console.log(currentRun)
+                  // console.log(currentPlayer)
+                  return currentPlayer
+              }
+          } else {//switch to new player
+              currentPlayer = board[y][x]
+              currentRun = 1
+          }
+      }
+  }
+  // check vertical
+  for (y = 0; y < board.length; y++) {
+      currentPlayer = ''
+      currentRun = 0
+      for (x = 0; x < board.length; x++) {
+          //check for continuation
+          if (board[y][x] !== '' && board[y][x] === currentPlayer) {
+              currentRun++
+              if (currentRun === winSize) {
+                  return currentPlayer
+              }
+          } else {//switch to new player
+              currentPlayer = board[y][x]
+              currentRun = 1
+          }
+      }
+  }
+  // check diagonal down right
+  // start bottom left... start only when length possible
+  // move to top right... stop when length impossible
+  var calcDiagLength = (i) => { //calculate length of each diagonal
+      if (i < board.length) {
+          return i + 1
+      } else {
+          return board.length * 2 - 1 - i
+      }
+  }
+  var calcDiagStartCoords = (i) => { //returns {x: ?, y: ?}
+      if (i < board.length) {
+          return { x: 0, y: board.length - 1 - i }
+      } else {
+          return { x: i - board.length - 2, y: 0 }
+      }
+  }
+  var i
+  var n
+  var diagStartCoords
+  var diagLength
+  for (i = winSize - 1; i < (board.length * 2 - 1 - (winSize - 1)); i++) { //each diagonal is numbered (starting with 0), heres where to start and end.
+      currentPlayer = ''
+      currentRun = 0
+      diagStartCoords = calcDiagStartCoords(i)
+      diagLength = calcDiagLength(i)
+      for (n = 0; n < diagLength; n++) {
+          console.log('-')
+          console.log(diagStartCoords)
+          console.log(n)
+          //check for continuation
+          x = diagStartCoords.x + n
+          y = diagStartCoords.y + n
+          if (board[y][x] !== '' && board[y][x] === currentPlayer) {
+              currentRun++
+              if (currentRun === winSize) {
+                  return currentPlayer
+              }
+          } else {//switch to new player
+              currentPlayer = board[y][x]
+              currentRun = 1
+          }
+      }
+  }
+  // check diagonal up right
+  // start top left... 
+  // end bottom right...
+  var calcDiagUpStartCoords = (i) => { //returns {x: ?, y: ?}
+      if (i < board.length) {
+          return { x: 0, y: i }
+      } else {
+          return { x: i - board.length + 1, y: board.length - 1 }
+      }
+  }
+  console.log('diag/..')
+  for (i = winSize - 1; i < (board.length * 2 - 1 - (winSize - 1)); i++) { //each diagonal is numbered (starting with 0), heres where to start and end.
+      currentPlayer = ''
+      currentRun = 0
+      diagStartCoords = calcDiagUpStartCoords(i)
+      diagLength = calcDiagLength(i)
+      for (n = 0; n < diagLength; n++) {
+          console.log('-')
+          console.log(diagStartCoords)
+          console.log(n)
+          //check for continuation
+          x = diagStartCoords.x + n
+          y = diagStartCoords.y - n
+          if (board[y][x] !== '' && board[y][x] === currentPlayer) {
+              currentRun++
+              if (currentRun === winSize) {
+                  return currentPlayer
+              }
+          } else {//switch to new player
+              currentPlayer = board[y][x]
+              currentRun = 1
+          }
+      }
+  }
+}
 
 
 // Listens for new messages added to /messages/:documentId/original and creates an
