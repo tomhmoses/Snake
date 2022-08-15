@@ -25,6 +25,13 @@ admin.initializeApp();
 
 // Create a new game in Firestore and return the game ID.
 exports.createGame = functions.https.onRequest(async (req, res) => {
+    // get uid from idToken
+    const uid = await getUid(req.query.idToken);
+    // check we have a uid
+    if (!uid) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
     // get the game size from the request
     const size = parseInt(req.query.size);
     // get the win size from the request
@@ -45,17 +52,22 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
     // create a new game in Firestore using the Firebase Admin SDK
     var game = {board: board, size: size, winSize: winSize, turn: 0, winner: null, started: false};
     game['players'] = {};
-    game['players'][req.query.uid] = {symbol: 'X', color: 'indigo', playerNum: 0};
+    game['players'][uid] = {symbol: 'X', color: 'indigo', playerNum: 0};
     const writeResult = await admin.firestore().collection('games').add(game);
     res.json({result: `Game with ID: ${writeResult.id} created.`, gameId: writeResult.id});
 });
 
 // Join a game
 exports.joinGame = functions.https.onRequest(async (req, res) => {
+  // get uid from idToken
+  const uid = await getUid(req.query.idToken);
+  // check we have a uid
+  if (!uid) {
+      res.status(401).send('Unauthorized');
+      return;
+  }
     // get the game ID from the request
     const gameId = req.query.gameId;
-    // get the player's UID from the request
-    const uid = req.query.uid;
     // get the player's symbol from the request
     const symbol = req.query.symbol;
     // get the player's color from the request
@@ -93,6 +105,13 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
 
 // Start a game
 exports.startGame = functions.https.onRequest(async (req, res) => {
+    // get uid from idToken
+    const uid = await getUid(req.query.idToken);
+    // check we have a uid
+    if (!uid) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
     // get the game ID from the request
     const gameId = req.query.gameId;
     // check if the game exists
@@ -113,6 +132,11 @@ exports.startGame = functions.https.onRequest(async (req, res) => {
         res.status(400).send('Not enough players.');
         return;
     }
+    // check the player is in the game
+    if (!players[uid]) {
+        res.status(400).send('Player not in game.');
+        return;
+    }
     // start the game
     await gameRef.update({started: true});
     res.json({result: `Game with ID: ${gameId} started.`});
@@ -120,10 +144,15 @@ exports.startGame = functions.https.onRequest(async (req, res) => {
 
 // Play a turn in a game
 exports.playTurn = functions.https.onRequest(async (req, res) => {
+    // get uid from idToken
+    const uid = await getUid(req.query.idToken);
+    // check we have a uid
+    if (!uid) {
+        res.status(401).send('Unauthorized');
+        return;
+    }
     // get the game ID from the request
     const gameId = req.query.gameId;
-    // get the player's UID from the request
-    const uid = req.query.uid;
     // get the player's turn from the request
     const x = parseInt(req.query.x);
     const y = parseInt(req.query.y);
@@ -352,4 +381,13 @@ function createBoard(size) {
   // cannot store nested arrays in Firestore, so using strings of characters for inner ones
   const blank='_';
   return [...Array(size)].map(() => blank.repeat(size))
+}
+
+function getUid(idToken) {
+  return admin.auth().verifyIdToken(idToken).then(decodedToken => {
+    console.log('decodedToken', decodedToken);
+    return decodedToken.uid;
+  }).catch(error => {
+    console.log(error);
+  });
 }
