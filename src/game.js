@@ -25,17 +25,30 @@ export function Game(props) {
         var winner = gameData.winner
         var turn = gameData.turn
         var players = gameData.players
+        let myTurn = false;
+        if (started && !winner && turn % players.length === props.playerNum) {
+            myTurn = true;
+        }
 
         function clickCell(x, y) {
-            if (!winner) {
-                console.log('TODO: clickCell')
+            if (myTurn) {
+                var url = new URL("https://x.tmos.es/api/playTurn"),
+                    params = { idToken: props.user.accessToken, gameId: props.gameId }
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+                fetch(url)
+                    .then(response => response.json())
+                    .then((response) => {
+                        // could we temporarily set the game to be what we think it will be?
+                        console.log('response:', response);
+                    })
+                    .catch(err => console.log(err))
             }
         }
 
         return (
             <div>
                 <p className='px-4 font-semibold'>ID: {props.gameId}</p>
-                <Players turn={turn} players={players} winner={winner} user={props.user}/>
+                <Players turn={turn} players={players} winner={winner} user={props.user} />
                 <Board board={board} clickCell={clickCell} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
             </div>
