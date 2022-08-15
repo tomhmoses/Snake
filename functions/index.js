@@ -173,6 +173,16 @@ function setCharAt(str,index,chr) {
   return str.substring(0,index) + chr + str.substring(index+1);
 }
 
+// Check for a winner in a game
+exports.checkWinner = functions.firestore.document('/games/{gameId}')
+.onUpdate((snap, context) => { 
+    // get the game data
+    const gameData = snap.after.data();
+    console.log('TODO: check for winner');
+});
+
+
+
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
 exports.makeUppercase = functions.firestore.document('/messages/{documentId}')
