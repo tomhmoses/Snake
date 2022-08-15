@@ -9,13 +9,13 @@ function classNames(...classes) {
 
 export function Join(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
-    const [gameID, setGameID] = useState('');
+    const [gameId, setgameId] = useState('');
     const [symbol, setSymbol] = useState('Y');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleChange = ({ target }) => {
-        setGameID(target.value);
+        setgameId(target.value);
     }
 
     const handleSymbolChange = ({ target }) => {
@@ -38,7 +38,7 @@ export function Join(props) { //new online? game
         if (!loading) {
             setLoading(true);
             var url = new URL("https://x.tmos.es/api/joinGame"),
-              params = { idToken: props.user.accessToken, gameID: gameID, symbol: symbol }
+              params = { idToken: props.user.accessToken, gameId: gameId, symbol: symbol }
             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
             fetch(url)
               .then(response => response.text())
@@ -47,7 +47,7 @@ export function Join(props) { //new online? game
                 console.log(response);
                 setLoading(false);
                 if (response.includes('Cool!')) {
-                    props.setGameId(gameID);
+                    props.setgameId(gameId);
                 } else {
                     setError(response);
                 }
@@ -60,7 +60,7 @@ export function Join(props) { //new online? game
         setExpanded(!expanded);
     };
 
-    const gameIDInput = useRef(null)
+    const gameIdInput = useRef(null)
 
 
     return ( // base style from: https://tailwindui.com/components/application-ui/overlays/modals
@@ -73,7 +73,7 @@ export function Join(props) { //new online? game
                     Join
                 </button>
             <Transition.Root show={expanded} as={Fragment}>
-                <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={gameIDInput} onClose={toggleExpand}>
+                <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={gameIdInput} onClose={toggleExpand}>
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <Transition.Child
                             as={Fragment}
@@ -118,8 +118,8 @@ export function Join(props) { //new online? game
                                                     </p>
                                                 </div>
                                                 <input
-                                                    ref={gameIDInput}
-                                                    value={gameID}
+                                                    ref={gameIdInput}
+                                                    value={gameId}
                                                     onChange={handleChange}
                                                     type="text"
                                                     spellcheck="false"
