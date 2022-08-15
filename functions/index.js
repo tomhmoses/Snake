@@ -79,7 +79,21 @@ exports.joinGame = functions
       const gameId = req.query.gameId;
       // check we were sent a gameId
       if (!gameId) {
-        res.status(400).send("Game not found.");
+        res.status(400).send("Game not found (no Id sent).");
+        return;
+      }
+      // check if the game exists
+      const gameRef = admin.firestore().collection("games").doc(gameId);
+      const gameData = await gameRef.get();
+      if (!gameData.exists) {
+        res.status(404).send("Game not found.");
+        return;
+      }
+      // check if the player is already in the game
+      const players = gameData.data().players;
+      console.log("players", players);
+      if (players[uid]) {
+        res.status(200).send("Cool! Player already in game.");
         return;
       }
       // get the player"s symbol from the request
@@ -91,23 +105,9 @@ exports.joinGame = functions
       }
       // get the player"s color from the request
       const color = "" + req.query.color;
-      // check if the game exists
-      const gameRef = admin.firestore().collection("games").doc(gameId);
-      const gameData = await gameRef.get();
-      if (!gameData.exists) {
-        res.status(404).send("Game not found.");
-        return;
-      }
       // check if game is started
       if (gameData.data().started) {
         res.status(400).send("Game already started.");
-        return;
-      }
-      // check if the player is already in the game
-      const players = gameData.data().players;
-      console.log("players", players);
-      if (players[uid]) {
-        res.status(200).send("Cool! Player already in game.");
         return;
       }
       // check if symbol is already in use
