@@ -247,7 +247,10 @@ exports.checkWinner = functions.firestore.document("/games/{gameId}")
       // convert board to 2D array
       const betterBoard = [];
       for (let i = 0; i < gameData.size; i++) {
-        betterBoard.push(gameData.board[i].split(""));
+        betterBoard.push(gameData.board[i].split("").map(
+            (element) => {
+              return element === "_" ? "" : element;
+            }));
       }
       console.log("betterBoard", betterBoard);
       console.log("winSize", gameData.winSize);
