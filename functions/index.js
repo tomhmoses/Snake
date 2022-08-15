@@ -31,7 +31,7 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
     const board = createBoard(size);
     console.log('board', board);
     // create a new game in Firestore using the Firebase Admin SDK
-    var game = {board: board, size: size, turn: 0, winner: null};
+    var game = {board: board, size: size, turn: 0, winner: null, started: false};
     game['players'] = {};
     game['players'][req.query.uid] = {symbol: 'X', color: 'indigo'};
     const writeResult = await admin.firestore().collection('games').add(game);
@@ -55,6 +55,11 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
         res.status(404).send('Game not found.');
         return;
     }
+    // check if game is started
+    if (gameData.data().started) {
+        res.status(400).send('Game already started.');
+        return;
+    }
     // check if the player is already in the game
     const players = gameData.data().players;
     console.log('players', players);
@@ -73,6 +78,9 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
     await gameRef.update({players: players});
     res.json({result: `Player with UID: ${uid} added to game with ID: ${gameId}.`});
 });
+
+// Play a turn in a game
+exports.playTurn = functions.https.onRequest(async (req, res) => {
 
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
