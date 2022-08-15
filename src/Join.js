@@ -68,7 +68,7 @@ export function Join(props) { //new online? game
                 <button
                     type="button"
                     onClick={toggleExpand}
-                    className=""
+                    className="text-center p-4 font-extrabold text-xl w-full"
                 >
                     Join
                 </button>

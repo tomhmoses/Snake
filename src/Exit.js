@@ -9,7 +9,7 @@ export function Exit(props) {
             <button
                 type="button"
                 onClick={exit}
-                className=""
+                className="text-center p-4 font-extrabold text-xl w-full"
             >
                 Exit
             </button>
