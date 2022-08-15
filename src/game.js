@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { doc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firehooks/firestore';
 import { Start } from './Start';
@@ -7,6 +7,8 @@ import { Players } from './Players';
 export function Game(props) {
     const gameRef = doc(props.firestore, "games", props.gameId);
     const [gameData, loading, error] = useDocumentData(gameRef);
+    const [usingLocalBoard, setUsingLocalBoard] = useState(false);
+    const [localBoard, setLocalBoard] = useState(null);
 
     console.log(gameData)
 
@@ -25,24 +27,22 @@ export function Game(props) {
         var winner = gameData.winner
         var turn = gameData.turn
         var players = gameData.players
+        var numOfplayers = Object.keys(players).length
         let myTurn = false;
-        if (started && !winner && turn % players.length === players[props.user.uid].playerNum) {
+        if (started && !winner && (turn % numOfplayers === players[props.user.uid].playerNum)) {
             myTurn = true;
         }
 
-        const increaseTurn = () => {
-            turn = turn + 1;
-        }
         const tempSetBoardLocation = (x, y, element) => {
             board[y][x] = element;
+            setLocalBoard(board);
+            setUsingLocalBoard(true);
         }
 
         function clickCell(x, y) {
             console.log('myTurn', myTurn)
             if (myTurn) {
-
-                increaseTurn();
-                tempSetBoardLocation(x, y, props.playerSymbol);
+                tempSetBoardLocation(x, y, players[props.user.uid].symbol);
                 console.log('temparily changed local board')
                 var url = new URL("https://x.tmos.es/api/playTurn"),
                     params = { idToken: props.user.accessToken, gameId: props.gameId, x: x, y: y }
@@ -50,12 +50,20 @@ export function Game(props) {
                 fetch(url)
                     .then(response => response.json())
                     .then((response) => {
+                        setUsingLocalBoard(false);
                         // could we temporarily set the game to be what we think it will be?
                         console.log('response:', response);
                     })
                     .catch(err => console.log(err))
+                    .finally(() => {setUsingLocalBoard(false);})
             }
         }
+
+        if (usingLocalBoard) {
+            board = localBoard;
+            turn += 1;
+        }
+
 
         return (
             <div>
