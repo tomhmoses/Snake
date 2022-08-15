@@ -11,6 +11,7 @@ export function New(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
     const [boardSize, setBoardSize] = useState(3);
     const [winSize, setWinSize] = useState(3);
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleSizeChange = ({ target }) => {
@@ -28,15 +29,18 @@ export function New(props) { //new online? game
               params = { idToken: props.user.accessToken, size: boardSize, winSize: winSize }
             Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
             fetch(url)
-              .then(response => response.text())
+              .then(response => response.json())
               .then((response) => {
-                console.log('response:');
-                console.log(response);
-                console.log(response.gameId)
-                console.log(response["gameId"])
+                // console.log('response:');
+                // console.log(response);
+                // console.log(response.gameId)
+                // console.log(response["gameId"])
                 setLoading(false);
-                if (response.includes('created')) {
+                if (response.gameId) {
                     props.setGameId(response.gameId);
+                } else {
+                    console.log('response:', response);
+                    setError(response.error);
                 }
               })
               .catch(err => console.log(err))
@@ -97,6 +101,7 @@ export function New(props) { //new online? game
                                             <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
                                                 Create a new game
                                             </Dialog.Title>
+                                            {error && <div className="mt-2 text-sm leading-5 text-red-500">{error}</div>}
                                             <div className="mt-2">
                                                 <div className='flex justify-between'>
                                                     <p className="text-sm text-gray-500">

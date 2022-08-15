@@ -10,6 +10,7 @@ function classNames(...classes) {
 export function Join(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
     const [gameID, setGameID] = useState(3);
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleChange = ({ target }) => {
@@ -30,6 +31,8 @@ export function Join(props) { //new online? game
                 setLoading(false);
                 if (response.includes('Cool!')) {
                     props.setGameId(gameID);
+                } else {
+                    setError(response);
                 }
               })
               .catch(err => console.log(err))
@@ -90,6 +93,7 @@ export function Join(props) { //new online? game
                                             <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
                                                 Join a game
                                             </Dialog.Title>
+                                            {error && <div className="mt-2 text-sm leading-5 text-red-500">{error}</div>}
                                             <div className="mt-2">
                                                 <div className='flex justify-between'>
                                                     <p className="text-sm text-gray-500">
