@@ -90,7 +90,7 @@ exports.joinGame = functions
         return;
       }
       // get the player"s color from the request
-      const color = req.query.color;
+      const color = "" + req.query.color;
       // check if the game exists
       const gameRef = admin.firestore().collection("games").doc(gameId);
       const gameData = await gameRef.get();
