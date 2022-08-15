@@ -11,8 +11,6 @@ export function Wrapper(props) {
         document.title = 'x: ' + props.gameId;
     });
 
-    console.log(props.auth)
-
     return (
         <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
                 <div className='h-full flex flex-col flex-grow'>

@@ -32,6 +32,8 @@ export function New(props) { //new online? game
               .then((response) => {
                 console.log('response:');
                 console.log(response);
+                console.log(response.gameId)
+                console.log(response["gameId"])
                 setLoading(false);
                 if (response.includes('created')) {
                     props.setGameId(response.gameId);
