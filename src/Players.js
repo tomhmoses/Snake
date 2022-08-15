@@ -13,20 +13,23 @@ export function Players(props) {
         }
     }
     players.sort(function(first, second) {
-        return second.playerNum - first.playerNum;
+        return first.playerNum - second.playerNum;
     });
     var turn = props.turn % players.length;
     
     return (
-        <div>
-            <div className='flex'>
+        <div className='flex-col justify-center p-4'>
+            <div className='flex justify-center'>
                 {players.map((player, index) => (
                     <div key={index} className={classNames(
-                        turn === index ? 'animate-pulse' : '',
-                        player.uid === props.user.uid ? 'bg-indigo-600' : 'bg-indigo-100',
-                         '')}>{player.symbol}</div>
+                        turn === index ? 'underline' : '',
+                        player.uid === props.user.uid ? '' : '',
+                         ' text-2xl p-1')}>{player.symbol}</div>
                         ))}
             </div>
+            <div className='flex justify-center p-1'>You are: {props.players[props.user.uid].symbol}</div>
+            {props.myTurn && <div className='flex justify-center p-1'>Your turn</div>}
+            {!props.gameStarted && <div className='flex justify-center p-1'>Wait for more players to join, or click Start to begin the game.</div>}
         </div>
     )
 }

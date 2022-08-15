@@ -67,10 +67,10 @@ export function Game(props) {
 
         return (
             <div>
-                <p className='px-4 font-semibold'>ID: {props.gameId}</p>
-                <Players turn={turn} players={players} winner={winner} user={props.user} />
-                <Board board={board} clickCell={clickCell} />
+                <p className='font-semibold'>Game: {props.gameId}</p>
+                <Players turn={turn} players={players} winner={winner} user={props.user} myTurn={myTurn} started={started} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
+                <Board board={board} clickCell={clickCell} />
             </div>
         )
     } else if (loading) {
