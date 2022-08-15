@@ -34,7 +34,7 @@ export function Game(props) {
 
         return (
             <div>
-                <p>{props.gameId}</p>
+                <p className='px-4 font-semibold'>ID: {props.gameId}</p>
                 <Players turn={turn} players={players} winner={winner} user={props.user}/>
                 <Board board={board} clickCell={clickCell} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
