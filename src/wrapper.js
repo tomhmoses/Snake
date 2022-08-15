@@ -8,7 +8,7 @@ import { Exit } from './Exit';
 export function Wrapper(props) {
     const [gameId, setGameId] = useState(null)
     useEffect(() => {
-        document.title = 'x: ' + props.gameId;
+        document.title = 'x: ' + gameId;
     });
 
     return (
