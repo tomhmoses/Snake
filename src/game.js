@@ -102,7 +102,7 @@ function Board(props) {
 
 function Row(props) {
     return (
-        <div className='flex min-h-10 flex-grow'>
+        <div className='flex min-h-10 h-1 flex-grow'>
             {props.row.map((element, x) => (
                 <Cell element={element} x={x} key={x} y={props.y} clickCell={props.clickCell} />
             ))}
@@ -118,7 +118,7 @@ function Cell(props) {
         }
     }
     return (
-        <div className={classNames(!props.element ? 'text-center cursor-pointer' : '', 'border-indigo-100 border-[1px] flex flex-grow w-10 text-2xl text-center content-center flex-col')} onClick={clickThisCell}>
+        <div className={classNames(!props.element ? 'text-center cursor-pointer' : '', 'border-indigo-100 border-[1px] flex flex-grow w-1 text-2xl text-center content-center flex-col')} onClick={clickThisCell}>
             <div className='flex flex-grow'></div>
             <div className=''>{props.element}</div>
             <div className='flex flex-grow'></div>
