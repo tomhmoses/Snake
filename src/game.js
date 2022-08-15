@@ -1,6 +1,8 @@
 import React from 'react';
 import { doc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firehooks/firestore';
+import { Start } from './Start';
+import { Players } from './Players';
 
 export function Game(props) {
     const gameRef = doc(props.firestore, "games", props.gameId);
@@ -19,8 +21,10 @@ export function Game(props) {
                 }
             ));
         }
+        var started = gameData.started
         var winner = gameData.winner
         var turn = gameData.turn
+        var players = gameData.players
 
         function clickCell(x, y) {
             if (!winner) {
@@ -30,9 +34,10 @@ export function Game(props) {
 
         return (
             <div>
-                {!winner && <div>{turn}'s Turn</div>}
-                {winner && <div>{winner} Wins!</div>}
+                <p>{props.gameId}</p>
+                <Players turn={turn} players={players} winner={winner} user={props.user}/>
                 <Board board={board} clickCell={clickCell} />
+                {!started && <Start gameId={props.gameId} user={props.user} />}
             </div>
         )
     } else if (loading) {
