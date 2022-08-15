@@ -61,10 +61,21 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
   };
   game["players"] = {};
   game["players"][uid] = {symbol: "X", color: "indigo", playerNum: 0};
-  const writeResult = await admin.firestore().collection("games").add(game);
+
+  // create ID for the game
+  let gameId = "";
+  // create an unused gameId
+  do {
+    gameId = makeId(5);
+  // eslint-disable-next-line max-len
+  } while (await admin.firestore().collection("games").doc(gameId).get().then((doc) => {
+    return doc.exists;
+  }));
+  // add the game to Firestore
+  await admin.firestore().collection("games").doc(gameId).set(game);
   res.json({
-    result: `Game with ID: ${writeResult.id} created.`,
-    gameId: writeResult.id,
+    result: `Game with ID: ${gameId} created.`,
+    gameId: gameId,
   });
 });
 
@@ -207,7 +218,7 @@ exports.playTurn = functions.https.onRequest(async (req, res) => {
   }
   // check if the x and y are valid
   if (x < 0 || x >= gameData.data().size ||
-      y < 0 || y >= gameData.data().size) {
+    y < 0 || y >= gameData.data().size) {
     res.status(400).send("Invalid x or y.");
     return;
   }
@@ -430,4 +441,16 @@ function getUid(idToken) {
   }).catch((error) => {
     console.log(error);
   });
+}
+
+// eslint-disable-next-line require-jsdoc
+function makeId(length) {
+  let result = "";
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
+  }
+  return result;
 }
