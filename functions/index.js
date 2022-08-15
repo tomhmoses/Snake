@@ -26,6 +26,7 @@ admin.initializeApp();
 
 // Create a new game in Firestore and return the game ID.
 exports.createGame = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   // get uid from idToken
   const uid = await getUid(req.query.idToken);
   // check we have a uid
@@ -81,6 +82,7 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
 
 // Join a game
 exports.joinGame = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   // get uid from idToken
   const uid = await getUid(req.query.idToken);
   // check we have a uid
@@ -143,6 +145,7 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
 
 // Start a game
 exports.startGame = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   // get uid from idToken
   const uid = await getUid(req.query.idToken);
   // check we have a uid
@@ -182,6 +185,7 @@ exports.startGame = functions.https.onRequest(async (req, res) => {
 
 // Play a turn in a game
 exports.playTurn = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   // get uid from idToken
   const uid = await getUid(req.query.idToken);
   // check we have a uid
