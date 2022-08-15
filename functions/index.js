@@ -33,7 +33,7 @@ exports.createGame = functions.https.onRequest(async (req, res) => {
     // create a new game in Firestore using the Firebase Admin SDK
     var game = {board: board, size: size, turn: 0, winner: null, started: false};
     game['players'] = {};
-    game['players'][req.query.uid] = {symbol: 'X', color: 'indigo'};
+    game['players'][req.query.uid] = {symbol: 'X', color: 'indigo', playerNum: 0};
     const writeResult = await admin.firestore().collection('games').add(game);
     res.json({result: `Game with ID: ${writeResult.id} created.`, gameId: writeResult.id});
 });
@@ -74,7 +74,7 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
         return;
     }
     // add the player to the game
-    players[uid] = {symbol: symbol, color: color};
+    players[uid] = {symbol: symbol, color: color, playerNum: Object.keys(players).length};
     await gameRef.update({players: players});
     res.json({result: `Player with UID: ${uid} added to game with ID: ${gameId}.`});
 });
@@ -108,8 +108,70 @@ exports.startGame = functions.https.onRequest(async (req, res) => {
 
 // Play a turn in a game
 exports.playTurn = functions.https.onRequest(async (req, res) => {
-
+    // get the game ID from the request
+    const gameId = req.query.gameId;
+    // get the player's UID from the request
+    const uid = req.query.uid;
+    // get the player's turn from the request
+    const row = parseInt(req.query.row);
+    const col = parseInt(req.query.col);
+    // check if the game exists
+    const gameRef = admin.firestore().collection('games').doc(gameId);
+    const gameData = await gameRef.get();
+    if (!gameData.exists) {
+        res.status(404).send('Game not found.');
+        return;
+    }
+    // check if game is started
+    if (!gameData.data().started) {
+        res.status(400).send('Game not started.');
+        return;
+    }
+    // check if game is over
+    if (gameData.data().winner) {
+        res.status(400).send('Game already over.');
+        return;
+    }
+    // check if the player is in the game
+    const players = gameData.data().players;
+    if (!players[uid]) {
+        res.status(400).send('Player not in game.');
+        return;
+    }
+    // check if is the player's turn
+    const numOfplayers = Object.keys(players).length;
+    console.log('numOfplayers', numOfplayers);
+    console.log('turn', gameData.data().turn % numOfplayers);
+    console.log('playerNum', players[uid].playerNum);
+    if (gameData.data().turn % numOfplayers != players[uid].playerNum) {
+        res.status(400).send('Wrong turn.');
+        return;
+    }
+    // check if the row and column are valid
+    if (row < 0 || row >= gameData.data().size || col < 0 || col >= gameData.data().size) {
+        res.status(400).send('Invalid row or column.');
+        return;
+    }
+    // check if the row and column are empty
+    const board = gameData.data().board;
+    console.log('board', board);
+    console.log('row', row);
+    console.log('col', col);
+    console.log('whats there', board[row][col])
+    if (board[row][col] != '_') {
+        res.status(400).send('Space already taken.');
+        return;
+    }
+    // play the turn
+    board[col] = setCharAt(board[col], row, players[uid].symbol);
+    await gameRef.update({board: board, turn: gameData.data().turn + 1});
+    res.json({result: `Turn played.`});
 });
+
+function setCharAt(str,index,chr) {
+  if(index > str.length-1) return str;
+  return str.substring(0,index) + chr + str.substring(index+1);
+}
 
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
