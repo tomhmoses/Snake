@@ -29,7 +29,7 @@ export function Join(props) { //new online? game
                 console.log(response);
                 setLoading(false);
                 if (response.includes('Cool!')) {
-                    props.setGameID(gameID);
+                    props.setGameId(gameID);
                 }
               })
               .catch(err => console.log(err))

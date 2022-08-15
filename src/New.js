@@ -34,7 +34,7 @@ export function New(props) { //new online? game
                 console.log(response);
                 setLoading(false);
                 if (response.includes('created')) {
-                    props.setGameID(response.gameId);
+                    props.setGameId(response.gameId);
                 }
               })
               .catch(err => console.log(err))
