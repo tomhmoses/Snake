@@ -99,7 +99,7 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
   const players = gameData.data().players;
   console.log("players", players);
   if (players[uid]) {
-    res.status(400).send("Player already in game.");
+    res.status(200).send("Cool! Player already in game.");
     return;
   }
   // check if symbol is already in use
@@ -116,7 +116,7 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
   };
   await gameRef.update({players: players});
   res.json({
-    result: `Player with UID: ${uid} added to game with ID: ${gameId}.`,
+    result: `Cool! Player with UID: ${uid} added to game with ID: ${gameId}.`,
   });
 });
 
