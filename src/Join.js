@@ -9,13 +9,13 @@ function classNames(...classes) {
 
 export function Join(props) { //new online? game
     const [expanded, setExpanded] = useState(false);
-    const [gameId, setgameId] = useState('');
+    const [gameId, setGameId] = useState('');
     const [symbol, setSymbol] = useState('Y');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleChange = ({ target }) => {
-        setgameId(target.value);
+        setGameId(target.value);
     }
 
     const handleSymbolChange = ({ target }) => {
@@ -47,7 +47,7 @@ export function Join(props) { //new online? game
                 console.log(response);
                 setLoading(false);
                 if (response.includes('Cool!')) {
-                    props.setgameId(gameId);
+                    props.setGameId(gameId);
                 } else {
                     setError(response);
                 }
