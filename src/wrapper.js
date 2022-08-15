@@ -8,7 +8,11 @@ import { Exit } from './Exit';
 export function Wrapper(props) {
     const [gameId, setGameId] = useState(null)
     useEffect(() => {
-        document.title = 'x: ' + gameId;
+        if (gameId) {
+            document.title = 'x: ' + gameId;
+        } else {
+            document.title = 'x';
+        }
     });
 
     return (
