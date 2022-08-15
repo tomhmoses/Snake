@@ -251,7 +251,7 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
-// Check for a winner in a game
+// Check for a winner in a game (and update TTL)
 exports.checkWinner = functions
     .region("europe-west2").firestore.document("/games/{gameId}")
     .onUpdate((snap, context) => {
@@ -272,11 +272,21 @@ exports.checkWinner = functions
       console.log("winner", winner);
       if (winner) {
         // update the game
-        return snap.after.ref.update({winner: winner});
+        return snap.after.ref.update(
+            {winner: winner,
+              expireAt: newTTL()});
+      } else {
+        return snap.after.ref.update(
+            {expireAt: newTTL()});
       }
-      console.log("no winner");
     });
 
+// eslint-disable-next-line require-jsdoc
+function newTTL() {
+  const newDate = new Date();
+  newDate.setHours(newDate.getHours() + 24);
+  return newDate;
+}
 
 // eslint-disable-next-line require-jsdoc
 function checkForWinner(board, winSize = 3) {
