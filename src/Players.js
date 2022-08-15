@@ -29,7 +29,7 @@ export function Players(props) {
             </div>
             <div className='flex justify-center p-1'>You are: {props.players[props.user.uid].symbol}</div>
             {props.myTurn && <div className='flex justify-center p-1'>Your turn</div>}
-            {!props.gameStarted && <div className='flex justify-center p-1'>Wait for more players to join, or click Start to begin the game.</div>}
+            {!props.gameStarted && <div className='flex justify-center p-1'>Wait for the other players to join, then click Start to begin the game.</div>}
         </div>
     )
 }

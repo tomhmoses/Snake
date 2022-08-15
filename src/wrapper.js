@@ -16,7 +16,7 @@ export function Wrapper(props) {
     });
 
     return (
-        <div className='bg-black h-screen font-semibold text-indigo-400 p-10'>
+        <div className='bg-black min-h-screen font-semibold text-indigo-400 p-10'>
                 <div className='h-full flex flex-col flex-grow'>
                     <div className='flex-none'>
                         <h1 className="text-3xl font-bold underline decoration-wavy decoration-2 underline-offset-4 pb-2">x.tmos.es</h1>
