@@ -257,6 +257,14 @@ exports.checkWinner = functions
     .onUpdate((snap, context) => {
       // get the game data
       const gameData = snap.after.data();
+      const previousData = snap.before.data();
+
+      // We'll only do stuff if the turn has changed.
+      // This is crucial to prevent infinite loops.
+      if (gameData.turn == previousData.turn) {
+        return null;
+      }
+
       // convert board to 2D array
       const betterBoard = [];
       for (let i = 0; i < gameData.size; i++) {
