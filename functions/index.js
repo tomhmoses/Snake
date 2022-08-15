@@ -79,8 +79,37 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
     res.json({result: `Player with UID: ${uid} added to game with ID: ${gameId}.`});
 });
 
+// Start a game
+exports.startGame = functions.https.onRequest(async (req, res) => {
+    // get the game ID from the request
+    const gameId = req.query.gameId;
+    // check if the game exists
+    const gameRef = admin.firestore().collection('games').doc(gameId);
+    const gameData = await gameRef.get();
+    if (!gameData.exists) {
+        res.status(404).send('Game not found.');
+        return;
+    }
+    // check if game is started
+    if (gameData.data().started) {
+        res.status(400).send('Game already started.');
+        return;
+    }
+    // check if there are enough players
+    const players = gameData.data().players;
+    if (Object.keys(players).length < 2) {
+        res.status(400).send('Not enough players.');
+        return;
+    }
+    // start the game
+    await gameRef.update({started: true});
+    res.json({result: `Game with ID: ${gameId} started.`});
+});
+
 // Play a turn in a game
 exports.playTurn = functions.https.onRequest(async (req, res) => {
+
+});
 
 // Listens for new messages added to /messages/:documentId/original and creates an
 // uppercase version of the message to /messages/:documentId/uppercase
