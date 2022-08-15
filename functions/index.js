@@ -90,8 +90,18 @@ exports.joinGame = functions.https.onRequest(async (req, res) => {
   }
   // get the game ID from the request
   const gameId = req.query.gameId;
+  // check we were sent a gameId
+  if (!gameId) {
+    res.status(400).send("Game not found.");
+    return;
+  }
   // get the player"s symbol from the request
   const symbol = req.query.symbol;
+  // check we were sent a symbol
+  if (!symbol) {
+    res.status(400).send("Invalid Symbol");
+    return;
+  }
   // get the player"s color from the request
   const color = req.query.color;
   // check if the game exists
