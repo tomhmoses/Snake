@@ -24,6 +24,10 @@
         "function": "playTurn"
       },
       {
+        "source": "/api/startGame",
+        "function": "startGame"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
