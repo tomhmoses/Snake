@@ -211,9 +211,9 @@ exports.playTurn = functions
       }
       // check if is the player"s turn
       const numOfplayers = Object.keys(players).length;
-      console.log("numOfplayers", numOfplayers);
-      console.log("turn", gameData.data().turn % numOfplayers);
-      console.log("playerNum", players[uid].playerNum);
+      // console.log("numOfplayers", numOfplayers);
+      // console.log("turn", gameData.data().turn % numOfplayers);
+      // console.log("playerNum", players[uid].playerNum);
       if (gameData.data().turn % numOfplayers != players[uid].playerNum) {
         res.status(400).send("Wrong turn.");
         return;
@@ -226,10 +226,10 @@ exports.playTurn = functions
       }
       // check if the x and y are empty
       const board = gameData.data().board;
-      console.log("board", board);
-      console.log("x", x);
-      console.log("y", y);
-      console.log("whats there", board[y][x]);
+      // console.log("board", board);
+      // console.log("x", x);
+      // console.log("y", y);
+      // console.log("whats there", board[y][x]);
       if (board[y][x] != "_") {
         res.status(400).send("Space already taken.");
         return;
@@ -312,7 +312,7 @@ exports.checkWinner = functions
       console.log("winSize", gameData.winSize);
       // check if there is a winner
       const winner = checkForWinner(betterBoard, gameData.winSize);
-      console.log("winner", winner);
+      // console.log("winner", winner);
       if (winner) {
         // update the game
         return snap.after.ref.update(
@@ -334,128 +334,105 @@ function newTTL() {
 // eslint-disable-next-line require-jsdoc
 function checkForWinner(board, winSize = 3) {
   // check horizontal
+  let winner;
+  for (let i = 0; i < board.length; i++) {
+    winner = checkForWinnerInList(board[i], winSize);
+    if (winner) {
+      return winner;
+    }
+  }
+  // get list of columns
+  const columns = [];
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board.length; y++) {
+      columns[y] = columns[y] || [];
+      columns[y][x] = board[x][y];
+    }
+  }
+  // check columns
+  for (let i = 0; i < columns.length; i++) {
+    winner = checkForWinnerInList(columns[i], winSize);
+    if (winner) {
+      return winner;
+    }
+  }
+  // get list of diagonals (top left to bottom right)
+  const diagonals = [];
+  for (let i = 0; i < ((board.length * 2) - 1); i++) {
+    // calc starting x and y
+    const startX = Math.max(0, i - (board.length - 1));
+    const startY = Math.max(0, board.length - 1 - i);
+    // calc diagonal length
+    let diagonalLength;
+    if (i<board.length) {
+      diagonalLength = i + 1;
+    } else {
+      diagonalLength = board.length - (i - board.length + 1);
+    }
+    // console.log("diagonal number", i);
+    // console.log("diagonal length", diagonalLength);
+    // console.log("startX", startX);
+    // console.log("startY", startY);
+    for (let n = 0; n < diagonalLength; n++) {
+      diagonals[i] = diagonals[i] || [];
+      diagonals[i][n] = board[startY + n][startX + n];
+    }
+  }
+  console.log("diagonals", diagonals);
+  // check diagonals (top left to bottom right)
+  for (let i = 0; i < diagonals.length; i++) {
+    winner = checkForWinnerInList(diagonals[i], winSize);
+    if (winner) {
+      return winner;
+    }
+  }
+
+  // get list of diagonals (top right to bottom left)
+  const reverseDiagonals = [];
+  for (let i = 0; i < ((board.length * 2) - 1); i++) {
+    // calc starting x and y
+    const startX = Math.max(0, i - (board.length - 1));
+    const startY = Math.min(board.length - 1, i);
+    // calc diagonal length
+    let diagonalLength;
+    if (i<board.length) {
+      diagonalLength = i + 1;
+    } else {
+      diagonalLength = board.length - (i - board.length + 1);
+    }
+    for (let n = 0; n < diagonalLength; n++) {
+      reverseDiagonals[i] = reverseDiagonals[i] || [];
+      reverseDiagonals[i][n] = board[startY - n][startX + n];
+    }
+  }
+  console.log("reverseDiagonals", reverseDiagonals);
+  // check diagonals (top right to bottom left)
+  for (let i = 0; i < reverseDiagonals.length; i++) {
+    winner = checkForWinnerInList(reverseDiagonals[i], winSize);
+    if (winner) {
+      return winner;
+    }
+  }
+  return null;
+}
+
+// eslint-disable-next-line require-jsdoc
+function checkForWinnerInList(list, winSize = 3) {
   let currentPlayer = "";
   let currentRun = 0;
-  let x;
-  let y;
-  for (x = 0; x < board.length; x++) {
-    currentPlayer = "";
-    currentRun = 0;
-    for (y = 0; y < board.length; y++) {
-      // check for continuation
-      if (board[y][x] !== "" && board[y][x] === currentPlayer) {
-        currentRun++;
-        if (currentRun === winSize) {
-          // console.log("winner:")
-          // console.log(currentRun)
-          // console.log(currentPlayer)
-          return currentPlayer;
-        }
-      } else {// switch to new player
-        currentPlayer = board[y][x];
-        currentRun = 1;
+  for (let i = 0; i < list.length; i++) {
+    // check for continuation
+    if (list[i] !== "" && list[i] === currentPlayer) {
+      currentRun++;
+      if (currentRun === winSize) {
+        return currentPlayer;
       }
+    } else {// switch to new player
+      currentPlayer = list[i];
+      currentRun = 1;
     }
   }
-  // check vertical
-  for (y = 0; y < board.length; y++) {
-    currentPlayer = "";
-    currentRun = 0;
-    for (x = 0; x < board.length; x++) {
-      // check for continuation
-      if (board[y][x] !== "" && board[y][x] === currentPlayer) {
-        currentRun++;
-        if (currentRun === winSize) {
-          return currentPlayer;
-        }
-      } else {// switch to new player
-        currentPlayer = board[y][x];
-        currentRun = 1;
-      }
-    }
-  }
-  // check diagonal down right
-  // start bottom left... start only when length possible
-  // move to top right... stop when length impossible
-  const calcDiagLength = (i) => { // calculate length of each diagonal
-    if (i < board.length) {
-      return i + 1;
-    } else {
-      return board.length * 2 - 1 - i;
-    }
-  };
-  const calcDiagStartCoords = (i) => { // returns {x: ?, y: ?}
-    if (i < board.length) {
-      return {x: 0, y: board.length - 1 - i};
-    } else {
-      return {x: i - board.length - 2, y: 0};
-    }
-  };
-  let i;
-  let n;
-  let diagStartCoords;
-  let diagLength;
-  for (i = winSize - 1; i < (board.length * 2 - 1 - (winSize - 1)); i++) {
-    // each diagonal is numbered (starting with 0),
-    // heres where to start and end.
-    currentPlayer = "";
-    currentRun = 0;
-    diagStartCoords = calcDiagStartCoords(i);
-    diagLength = calcDiagLength(i);
-    for (n = 0; n < diagLength; n++) {
-      console.log("-");
-      console.log(diagStartCoords);
-      console.log(n);
-      // check for continuation
-      x = diagStartCoords.x + n;
-      y = diagStartCoords.y + n;
-      if (board[y][x] !== "" && board[y][x] === currentPlayer) {
-        currentRun++;
-        if (currentRun === winSize) {
-          return currentPlayer;
-        }
-      } else {// switch to new player
-        currentPlayer = board[y][x];
-        currentRun = 1;
-      }
-    }
-  }
-  // check diagonal up right
-  // start top left...
-  // end bottom right...
-  const calcDiagUpStartCoords = (i) => { // returns {x: ?, y: ?}
-    if (i < board.length) {
-      return {x: 0, y: i};
-    } else {
-      return {x: i - board.length + 1, y: board.length - 1};
-    }
-  };
-  console.log("diag/..");
-  for (i = winSize - 1; i < (board.length * 2 - 1 - (winSize - 1)); i++) {
-    // each diagonal is numbered (starting with 0),
-    // heres where to start and end.
-    currentPlayer = "";
-    currentRun = 0;
-    diagStartCoords = calcDiagUpStartCoords(i);
-    diagLength = calcDiagLength(i);
-    for (n = 0; n < diagLength; n++) {
-      console.log("-");
-      console.log(diagStartCoords);
-      console.log(n);
-      // check for continuation
-      x = diagStartCoords.x + n;
-      y = diagStartCoords.y - n;
-      if (board[y][x] !== "" && board[y][x] === currentPlayer) {
-        currentRun++;
-        if (currentRun === winSize) {
-          return currentPlayer;
-        }
-      } else {// switch to new player
-        currentPlayer = board[y][x];
-        currentRun = 1;
-      }
-    }
-  }
+  return null;
 }
 
 // eslint-disable-next-line require-jsdoc
