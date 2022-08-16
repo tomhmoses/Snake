@@ -29,8 +29,9 @@ export function Game(props) {
         var turn = gameData.turn
         var players = gameData.players
         var numOfplayers = Object.keys(players).length
+        const draw = !winner && turn === gameData.size * gameData.size;
         let myTurn = false;
-        if (started && !winner && (turn % numOfplayers === players[props.user.uid].playerNum)) {
+        if (started && !winner && !draw && (turn % numOfplayers === players[props.user.uid].playerNum)) {
             myTurn = true;
         }
 
@@ -69,10 +70,10 @@ export function Game(props) {
         return (
             <div>
                 <p className='font-semibold'>Game: {props.gameId}</p>
-                <Players turn={turn} players={players} winner={winner} user={props.user} myTurn={myTurn} started={started} />
+                <Players turn={turn} players={players} winner={winner} user={props.user} myTurn={myTurn} started={started} draw={draw} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
                 <Board board={board} clickCell={clickCell} />
-                {winner && <Reset gameId={props.gameId} user={props.user} />}
+                {(winner || draw) && <Reset gameId={props.gameId} user={props.user} />}
             </div>
         )
     } else if (loading) {

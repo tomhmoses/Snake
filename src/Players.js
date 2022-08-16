@@ -32,6 +32,7 @@ export function Players(props) {
             {props.myTurn && <div className='flex justify-center p-1'>Your turn</div>}
             {props.started && !props.winner && !props.myTurn && <div className='flex justify-center p-1'>{currentPlayer.symbol}'s turn</div>}
             {props.winner && <div className='flex justify-center p-1'>🎉 {props.winner} wins! 🎉</div>}
+            {props.draw && <div className='flex justify-center p-1'>It's a draw!</div>}
             {!props.started && <div className='flex justify-center p-1'>Wait for the other players to join, then click Start to begin the game.</div>}
         </div>
     )
