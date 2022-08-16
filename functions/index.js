@@ -272,7 +272,7 @@ exports.resetGame = functions
         return;
       }
       // create the board
-      const board = createBoard(gameData.size);
+      const board = createBoard(gameData.data().size);
       console.log("board", board);
       // create a new game in Firestore using the Firebase Admin SDK
       const game = {
