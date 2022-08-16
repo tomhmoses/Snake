@@ -70,6 +70,7 @@ export function Game(props) {
         return (
             <div>
                 <p className='font-semibold'>Game: {props.gameId}</p>
+                <p className='text-sm'>{gameData.winSize} in a line to win</p>
                 <Players turn={turn} players={players} winner={winner} user={props.user} myTurn={myTurn} started={started} draw={draw} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
                 <Board board={board} clickCell={clickCell} />
