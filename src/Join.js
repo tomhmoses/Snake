@@ -15,7 +15,7 @@ export function Join(props) { //new online? game
     const [loading, setLoading] = useState(false);
 
     const handleChange = ({ target }) => {
-        setGameId(target.value);
+        setGameId(target.value.toUpperCase());
     }
 
     const handleSymbolChange = ({ target }) => {
