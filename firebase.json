@@ -28,6 +28,10 @@
         "function": "startGame"
       },
       {
+        "source": "/api/resetGame",
+        "function": "resetGame"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

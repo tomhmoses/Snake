@@ -3,6 +3,7 @@ import { doc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firehooks/firestore';
 import { Start } from './Start';
 import { Players } from './Players';
+import { Reset } from './Reset';
 
 export function Game(props) {
     const gameRef = doc(props.firestore, "games", props.gameId);
@@ -71,6 +72,7 @@ export function Game(props) {
                 <Players turn={turn} players={players} winner={winner} user={props.user} myTurn={myTurn} started={started} />
                 {!started && <Start gameId={props.gameId} user={props.user} />}
                 <Board board={board} clickCell={clickCell} />
+                {winner && <Reset gameId={props.gameId} user={props.user} />}
             </div>
         )
     } else if (loading) {

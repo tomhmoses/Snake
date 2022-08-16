@@ -252,6 +252,40 @@ function setCharAt(str, index, chr) {
   return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
+exports.resetGame = functions
+    .region("europe-west2").https.onRequest(async (req, res) => {
+      res.set("Access-Control-Allow-Origin", "*");
+      // get uid from idToken
+      const uid = await getUid(req.query.idToken);
+      // check we have a uid
+      if (!uid) {
+        res.status(401).send("Unauthorized");
+        return;
+      }
+      // get the game ID from the request
+      const gameId = req.query.gameId;
+      // check if the game exists
+      const gameRef = admin.firestore().collection("games").doc(gameId);
+      const gameData = await gameRef.get();
+      if (!gameData.exists) {
+        res.status(404).send("Game not found.");
+        return;
+      }
+      // create the board
+      const board = createBoard(gameData.size);
+      console.log("board", board);
+      // create a new game in Firestore using the Firebase Admin SDK
+      const game = {
+        board: board,
+        turn: 0,
+        winner: null,
+        started: false,
+        expireAt: newTTL(),
+      };
+      // update the game in Firestore
+      await gameRef.update(game);
+    });
+
 // Check for a winner in a game (and update TTL)
 exports.checkWinner = functions
     .region("europe-west2").firestore.document("/games/{gameId}")
